@@ -13,7 +13,7 @@ func main() {
     log.SetPrefix("day1: ")
     log.SetFlags(0)
 
-		depths, err := fileloading.LoadFile("input")
+		depths, err := fileloading.LoadFileAsIntSlice("input")
     // If an error was returned, print it to the console and
     // exit the program.
     if err != nil {
