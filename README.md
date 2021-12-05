@@ -23,5 +23,6 @@ go mod tidy
 ### Add Local Module
 ```bash
 go mod edit -replace aoc/fileloading=../fileloading
+go get aoc/fileloading
 go mod tidy
 ```
