@@ -17,6 +17,15 @@ func Contains(s []int, e int) bool {
     return false
 }
 
+func ContainsString(s []string, e string) bool {
+    for _, a := range s {
+        if a == e {
+            return true
+        }
+    }
+    return false
+}
+
 func ToInt(s string) int {
     i, _ := strconv.Atoi(s)
     return i
@@ -31,6 +40,22 @@ func GetIntArrayFromCSV(data []string) []int {
     }
 
     return intArr
+}
+
+func Create2DIntArray(data []string) [][]int {
+    var newArr = make([][]int, len(data))
+
+	for row, line := range data {
+		lineArr := strings.Split(line, "")
+		newArr[row] = make([]int, len(lineArr))
+		// fmt.Println(lineArr)
+		for col, height := range lineArr {
+			// fmt.Println(height)
+			newArr[row][col] = ToInt(height)
+		}
+	}
+
+    return newArr
 }
 
 func MinMax(array []int) (int, int) {
