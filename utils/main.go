@@ -81,3 +81,11 @@ func Debug(s string) {
 		fmt.Printf("\033[35m%s\n\033[0m", s)
 	}
 }
+
+func ReverseMap(m map[string]string) map[string]string {
+    n := make(map[string]string, len(m))
+    for k, v := range m {
+        n[v] = k
+    }
+    return n
+}
