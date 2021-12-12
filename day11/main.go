@@ -5,35 +5,16 @@ import (
 	"aoc/utils"
 	"fmt"
 	"log"
-	"sort"
 	"strings"
 )
 
-var navHashMap = map[string]string{
-    "(": ")",
-    "[": "]",
-    "{": "}",
-    "<": ">",
-}
-
-var reverseNavHashMap = utils.ReverseMap(navHashMap)
-
-var syntaxCost = map[string]int{
-    ")": 3,
-    "]": 57,
-    "}": 1197,
-    ">": 25137,
-}
-
-var syntaxScore = map[string]int{
-    "(": 1,
-    "[": 2,
-    "{": 3,
-    "<": 4,
-}
+var (
+	octopii [][]Point
+	flashes int = 0
+)
 
 func main() {
-		log.SetPrefix("day10: ")
+		log.SetPrefix("day11: ")
     log.SetFlags(0)
 
 		input, err := fileloading.LoadFileAsStringSlice("input.txt")
@@ -41,86 +22,150 @@ func main() {
         log.Fatal(err)
     }
 
-		fmt.Println("Day 10")
+		fmt.Println("Day 11")
 		utils.PrintAnswer(1, part1(input))
 		utils.PrintAnswer(2, part2(input))
 }
 
 func part1(data []string) int {
-	syntaxCosts := 0
+	flashes = 0
+	octopii = Create2DPointArray(data)
 
-	for _, line := range data {
-		lineChars := strings.Split(line, "")
-		stack := []string{}
-		illegalLinebreak:
+	// daily increase
+	for i := 0; i < 100; i++ {
+		resetFlashes()
+		for col, rows := range octopii {
+			for row, octopus := range rows {
+				if octopus.flashed {
+					continue
+				}
 
-		for _, character := range lineChars {
-			// if we are opening jsut append
-			if _, ok := navHashMap[character]; ok {
-				stack = append(stack, character)
-				continue
+				incr(octopii[col][row])
 			}
-
-			// if it matches then remove from the end
-			if stack[len(stack) - 1] == reverseNavHashMap[character] {
-				stack = stack[:len(stack) - 1]
-				continue
-			}
-
-			// We hit an illegal breakpoint
-			syntaxCosts += syntaxCost[character]
-			break illegalLinebreak
 		}
 
+		// fmt.Println(i+1)
+		// printOcto()
 	}
 
-
-	return syntaxCosts
+	return flashes
 }
 
 func part2(data []string) int {
-	scores := []int{}
+	flashes = 0
+	octopii = Create2DPointArray(data)
+	var currentStep int
 
-	for _, line := range data {
-		lineChars := strings.Split(line, "")
-		stack := []string{}
-		score := 0
-		illegalLinebreak:
+	// daily increase
+	for i := 0; i < 1000; i++ {
+		currentStep = i
+		syncedFlashes := flashes
+		resetFlashes()
+		for col, rows := range octopii {
+			for row, octopus := range rows {
+				if octopus.flashed {
+					continue
+				}
 
-		for _, character := range lineChars {
-			// if we are opening jsut append
-			if _, ok := navHashMap[character]; ok {
-				stack = append(stack, character)
-				continue
+				incr(octopii[col][row])
 			}
-
-			// if it matches then remove from the end
-			if stack[len(stack) - 1] == reverseNavHashMap[character] {
-				stack = stack[:len(stack) - 1]
-				continue
-			}
-
-			// We hit an illegal breakpoint
-			stack = []string{}
-			break illegalLinebreak
 		}
 
-		// fmt.Println(stack)
-
-		// toCloseStack := []string{}
-		// get the legal remaining
-		for i := len(stack); i > 0; i-- {
-			// fmt.Println(stack[i-1])
-			score = (5 * score) + syntaxScore[stack[i-1]]
-
+		if flashes - syncedFlashes == 100 {
+			// printOcto()
+			break
 		}
-		// fmt.Println(score)
-		if score != 0 {
-			scores = append(scores, score)
+
+		// fmt.Println(i+1)
+		// printOcto()
+	}
+
+	return currentStep + 1
+}
+
+type Point struct {
+	x, y, value int
+	flashed bool
+}
+
+func Create2DPointArray(data []string) [][]Point {
+    var newArr = make([][]Point, len(data))
+
+	for row, line := range data {
+		lineArr := strings.Split(line, "")
+		newArr[row] = make([]Point, len(lineArr))
+		for col, value := range lineArr {
+			newArr[row][col] = Point{ row, col, utils.ToInt(value), false }
 		}
 	}
-	sort.Ints(scores)
-	fmt.Println(scores)
-	var answer = int(float32(len(scores)-1)/2 + 0.5)
-	return scores[answer]
+
+    return newArr
+}
+
+func flash(octopus Point) {
+	x := octopus.x
+	y := octopus.y
+
+	if octopus.flashed {
+		return
+	}
+
+	flashes++
+
+	octopii[x][y].value = 0
+	octopii[x][y].flashed = true
+
+	// increase all points
+	incr(getPoint(x-1, y-1))
+	incr(getPoint(x-1, y))
+	incr(getPoint(x-1, y+1))
+	incr(getPoint(x, y-1))
+	incr(getPoint(x, y+1))
+	incr(getPoint(x+1, y-1))
+	incr(getPoint(x+1, y))
+	incr(getPoint(x+1, y+1))
+}
+
+func incr(octopus Point) {
+	x := octopus.x
+	y := octopus.y
+
+	if octopus.flashed {
+		return
+	}
+
+	octopii[x][y].value++
+
+	if octopii[x][y].value > 9 {
+		flash(octopii[x][y])
+	}
+}
+
+func resetFlashes() {
+	for col, rows := range octopii {
+		for row := range rows {
+			octopii[col][row].flashed = false
+		}
+	}
+}
+
+func printOcto() {
+	for _, rows := range octopii {
+		for _, octopus := range rows {
+			fmt.Print(octopus.value)
+		}
+		fmt.Println()
+	}
+}
+
+func getPoint(row, col int) Point {
+	if row < 0 || col < 0 {
+		return Point {0,0,0, true}
+	}
+
+	if row > len(octopii) -1 || col > len(octopii[row]) -1 {
+		return Point {0,0,0, true}
+	}
+
+	return octopii[row][col]
 }
