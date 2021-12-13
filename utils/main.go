@@ -2,11 +2,18 @@ package utils
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
 
 var DebugEnabled = true
+
+func GetDay() string {
+    dir, _ := os.Getwd()
+
+    return "Day " + dir[len(dir) - 2:]
+}
 
 func Contains(s []int, e int) bool {
     for _, a := range s {
@@ -88,4 +95,28 @@ func ReverseMap(m map[string]string) map[string]string {
         n[v] = k
     }
     return n
+}
+
+func UniqueInt(intSlice []int) []int {
+    keys := make(map[int]bool)
+    list := []int{}
+    for _, entry := range intSlice {
+        if _, value := keys[entry]; !value {
+            keys[entry] = true
+            list = append(list, entry)
+        }
+    }
+    return list
+}
+
+func UniqueString(stringSlice []string) []string {
+    keys := make(map[string]bool)
+    list := []string{}
+    for _, entry := range stringSlice {
+        if _, value := keys[entry]; !value {
+            keys[entry] = true
+            list = append(list, entry)
+        }
+    }
+    return list
 }
