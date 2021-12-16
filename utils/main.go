@@ -3,8 +3,10 @@ package utils
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var DebugEnabled = true
@@ -80,7 +82,13 @@ func MinMax(array []int) (int, int) {
 }
 
 func PrintAnswer(part int, answer int) {
-	fmt.Printf(" ✨ Part %d answer: \033[35m%v\033[0m \n", part, answer)
+    fmt.Printf(" ✨ Part %d answer: \033[35m%v\033[0m \n", part, answer)
+}
+
+func PrintAnswerTime(part int, answer int, startTime time.Time) {
+    elapsed := time.Since(startTime)
+
+	fmt.Printf(" ✨ Part %d answer: \033[35m%v\033[0m in \033[34m%s\033[0m \n", part, answer, elapsed)
 }
 
 func Debug(s string) {
@@ -119,4 +127,40 @@ func UniqueString(stringSlice []string) []string {
         }
     }
     return list
+}
+
+func SortStringIntMap(si map[string]int) []KV {
+    var ss []KV
+    for k, v := range si {
+        ss = append(ss, KV{k, v})
+    }
+
+    sort.Slice(ss, func(i, j int) bool {
+        return ss[i].Value > ss[j].Value
+    })
+
+    return ss
+}
+
+func SortRuneInt64Map(si map[rune]int64) []KRV {
+    var ss []KRV
+    for k, v := range si {
+        ss = append(ss, KRV{k, v})
+    }
+
+    sort.Slice(ss, func(i, j int) bool {
+        return ss[i].Value > ss[j].Value
+    })
+
+    return ss
+}
+
+type KRV struct {
+    Key   rune
+    Value int64
+}
+
+type KV struct {
+    Key   string
+    Value int
 }
