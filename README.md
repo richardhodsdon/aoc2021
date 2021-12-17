@@ -22,7 +22,7 @@ go mod tidy
 
 ### Add Local Module
 ```bash
-go mod edit -replace aoc/fileloading=../fileloading
-go get aoc/fileloading
+go mod edit -replace aoc/set=../set
+go get aoc/set
 go mod tidy
 ```
