@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/fileloading"
 	"aoc/utils"
+	"aoc/utilsgen"
 	"aoc/set"
 
 	"fmt"
